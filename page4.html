@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Olivarez College Tagaytay — Forgot Password</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* === Global Styles === */
+body {
+    font-family: "Century Gothic", sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url('images/labs.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}
+
+/* === Blur Effect for Background === */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: inherit;
+    filter: blur(8px) brightness(0.6);
+    z-index: -1;
+}
+
+/* === Container === */
+.container {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    text-align: center;
+    width: 90%;
+    max-width: 400px;
+    opacity: 0;
+    animation: fadeIn 1s forwards;
+}
+
+/* === Titles === */
+h1 {
+    color: #2e7d32;
+    font-size: 28px;
+    margin-bottom: 25px;
+    font-weight: 700;
+}
+
+/* === Input Fields === */
+input[type="email"] {
+    width:90%;
+    padding: 14px;
+    margin: 10px 0;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    font-size: 15px;
+    transition: 0.3s;
+}
+input[type="email"]:focus { 
+    border-color: #2e7d32; 
+    box-shadow: 0 0 8px rgba(46,125,50,0.3); 
+}
+
+/* === Buttons === */
+button.submit-btn, .back-btn {
+    width: 100%;
+    padding: 14px;
+    margin: 12px 0;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+}
+button.submit-btn { background: #2e7d32; color: white; }
+button.submit-btn:hover { background: #1b5e20; transform: scale(1.03); }
+button.back-btn { background: #ccc; color: #2e7d32; }
+button.back-btn:hover { background: #aaa; transform: scale(1.03); }
+
+/* === Message & Toast === */
+.message {
+    color: red;
+    font-weight: 600;
+    margin-top: 10px;
+}
+.toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2e7d32;
+    color: white;
+    padding: 16px 24px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 15px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease, transform 0.5s ease;
+    z-index: 3000;
+}
+.toast.show {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(-10px);
+}
+
+/* === Animations === */
+@keyframes fadeIn { to { opacity: 1; } }
+
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Retrieve Your Password</h1>
+    <form id="forgotForm">
+        <input type="email" id="email" placeholder="Enter your registered email" required>
+        <button type="submit" class="submit-btn">Retrieve Password</button>
+    </form>
+    <div class="message" id="message"></div>
+    <button onclick="window.location.href='index.html'" class="back-btn">Back to Login</button>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="toast"></div>
+
+<script>
+const form = document.getElementById('forgotForm');
+const messageDiv = document.getElementById('message');
+const toast = document.getElementById('toast');
+
+form.addEventListener('submit', function(e){
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim();
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const user = users.find(u => u.email === email);
+    if(!user){
+        messageDiv.textContent = "Email not found!";
+        return;
+    }
+
+    showToast(`Your password is: ${user.password}`);
+});
+
+// Show toast function
+function showToast(message){
+    toast.textContent = message;
+    toast.classList.add('show');
+    setTimeout(() => { toast.classList.remove('show'); }, 4000);
+}
+</script>
+</body>
+</html>

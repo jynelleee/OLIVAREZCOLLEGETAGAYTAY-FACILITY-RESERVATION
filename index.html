@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Olivarez College Tagaytay — Admin Dashboard Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+/* === Global Styles === */
+body {
+    font-family: "Century Gothic", sans-serif;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-image: url('images/BACK.jpg');
+    background-repeat: no-repeat;  
+    background-position: center;    
+    background-size: cover;         
+    background-attachment: fixed;   
+    transition: background 0.5s ease;
+}
+
+.wrapper {
+    text-align: center;
+    margin-bottom: 40px;
+    animation: floatLogo 3s ease-in-out infinite;
+}
+@keyframes floatLogo {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+.logo {
+    width: 120px;
+    margin-bottom: 15px;
+}
+h1 {
+    color: #1b5e20;
+    font-size: 32px;
+    margin: 0;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 3px rgba(0,0,0,0.15);
+}
+
+/* === Glassmorphic Login Card === */
+.container {
+    width: 400px;
+    max-width: 90%;
+    background: rgba(255, 255, 255, 0.15);
+    padding: 45px 35px;
+    border-radius: 25px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.2);
+    text-align: center;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeIn 1s forwards ease-out;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.container:hover {
+    transform: translateY(0);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+}
+@keyframes fadeIn {
+    to { opacity: 1; transform: translateY(0); }
+}
+
+h2 {
+    color: #0c4819;
+    font-size: 30px;
+    font-weight: 700;
+    margin-bottom: 30px;
+    font-weight: 300;
+}
+
+/* === Form Labels & Inputs === */
+label {
+    display: block;
+    text-align: left;
+    font-size: 14px;
+    margin-top: 12px;
+    margin-bottom: 5px;
+    font-weight: 300;
+    color: #ffffff;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 90%;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1.5px solid rgba(189, 189, 189, 0.6);
+    font-size: 15px;
+    background: rgba(255,255,255,0.3);
+    backdrop-filter: blur(5px);
+    transition: all 0.3s ease;
+    color: #000000;
+}
+
+input:focus {
+    border-color: #2e7d32;
+    box-shadow: 0 0 12px rgba(46,125,50,0.5);
+    outline: none;
+}
+
+/* === Buttons === */
+button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 15px;
+    border: none;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+#loginBtn {
+    background: linear-gradient(135deg, #2b6d2f, #418b46);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(46,125,50,0.4);
+}
+#loginBtn:hover {
+    background: linear-gradient(135deg, #2f6e33, #2e7d32);
+    transform: translateY(-2px) scale(1.05);
+}
+
+#createBtn {
+    background: linear-gradient(135deg, #c8e6c9, #a5d6a7);
+    color: #124315;
+}
+#createBtn:hover {
+    background: linear-gradient(135deg,  #2f6e33, #2e7d32);
+    transform: translateY(-2px) scale(1.05);
+}
+
+/* === Links === */
+a {
+    display: block;
+    font-size: 13px;
+    font-weight: 300;
+    margin-top: 8px;
+    text-align: left;
+    color: #ffffff;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+a:hover {
+    color: #1e1c90;
+    text-decoration: underline;
+}
+
+/* === Error Message === */
+.message {
+    color: #c62828;
+    font-weight: 700;
+    margin-top: 12px;
+    min-height: 20px;
+    text-align: center;
+}
+
+
+body.dark-mode a { color: #a5d6a7; }
+body.dark-mode #loginBtn {
+    background: linear-gradient(135deg, #66bb6a, #2e7d32);
+}
+body.dark-mode #loginBtn:hover {
+    background: linear-gradient(135deg, #2e7d32, #66bb6a);
+}
+body.dark-mode #createBtn {
+    background: linear-gradient(135deg, #2e7d32, #66bb6a);
+}
+body.dark-mode #createBtn:hover {
+    background: linear-gradient(135deg, #66bb6a, #2e7d32);
+}
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+    <img src="images/logo-oct.png" alt="Olivarez College Logo" class="logo">
+    <h1>Olivarez College Tagaytay</h1>
+</div>
+
+<div class="container">
+    <h2>Login</h2>
+    <form id="loginForm">
+        <label>Username</label>
+        <input type="text" id="username" placeholder="Username" required>
+      
+        <label>Password</label>
+        <input type="password" id="password" placeholder="Password" required>
+        
+        <a href="page4.html">Forgot Password?</a>
+
+        <div class="btn-group">
+            <button type="submit" id="loginBtn">Login</button>
+            <button type="button" id="createBtn" onclick="window.location.href='page2.html'">Create Account</button>
+        </div>
+
+        <div class="message" id="message"></div>
+    </form>
+</div>
+
+<script>
+const form = document.getElementById('loginForm');
+const messageDiv = document.getElementById('message');
+
+form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const usernameInput = document.getElementById('username').value.trim();
+    const passwordInput = document.getElementById('password').value;
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const user = users.find(u => (u.username === usernameInput || u.email === usernameInput) && u.password === passwordInput);
+    if(!user){
+        messageDiv.textContent = "Invalid username/email or password!";
+        return;
+    }
+    localStorage.setItem('loggedInUser', JSON.stringify(user));
+    if(user.role === "student"){
+        window.location.href = "page1.html";
+    } else if(user.role === "admin"){
+        window.location.href = "page5.html";
+    } else {
+        messageDiv.textContent = "User role not recognized!";
+    }
+});
+
+let users = JSON.parse(localStorage.getItem('users')) || [];
+if(!users.some(u => u.role === "admin")){
+    users.push({fullName:"Admin", email:"admin@school.com", username:"admin", password:"admin123", role:"admin"});
+    localStorage.setItem('users', JSON.stringify(users));
+}
+
+// Optional: Dark mode toggle
+let darkMode = false;
+setInterval(() => {
+    darkMode = !darkMode;
+    document.body.classList.toggle('dark-mode', darkMode);
+}, 12000);
+</script>
+</body>
+</html>

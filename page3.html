@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Olivarez College Tagaytay — Reserve Facility</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+body {
+    font-family: "Century Gothic", sans-serif;
+    background: linear-gradient(to bottom, #e8f5e9);
+    margin: 0;
+    min-height: 100vh;
+}
+
+/* === Header === */
+header {
+    width: 100%;
+    height: 150px;
+    background-image: url('images/BACK.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
+    position: relative;
+}
+header h1 {
+    font-size: 28px;
+    margin: 0;
+}
+
+/* === Container === */
+.container {
+    background: white;
+    padding: 40px 30px;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    width: 100%;
+    max-width: 500px;
+    margin: 20px auto;
+    opacity: 0;
+    animation: fadeIn 1s forwards;
+}
+
+@keyframes fadeIn { to { opacity: 1; } }
+
+h2 { 
+    text-align: center; 
+    color: #2e7d32; 
+    margin-bottom: 25px; 
+    font-size: 28px; 
+    font-weight: 700; 
+}
+
+form { display: flex; flex-direction: column; }
+
+label {
+    margin-top: 15px;
+    font-weight: 600;
+    color: #1b5e20;
+    font-size: 14px;
+}
+
+input, select, textarea, button {
+    margin-top: 5px;
+    padding: 12px 15px;
+    border-radius: 10px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    transition: border 0.3s, box-shadow 0.3s;
+}
+
+input:focus, select:focus, textarea:focus { 
+    border-color: #2e7d32; 
+    box-shadow: 0 0 8px rgba(46,125,50,0.3); 
+    outline: none; 
+}
+
+textarea { resize: none; }
+
+button {
+    margin-top: 20px;
+    background: #2e7d32;
+    color: white;
+    border: none;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+button:hover { background: #1b5e20; transform: scale(1.03); }
+
+/* === Post-submit buttons === */
+#postSubmit button {
+    width: 120px;
+    margin: 10px;
+    padding: 10px 0;
+    font-size: 16px;
+    font-weight: 600;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    color: white;
+    transition: 0.3s;
+}
+#postSubmit button:hover { transform: scale(1.05); }
+#goBackBtn { background: #2e7d32; }
+#exitBtn { background: #b71c1c; }
+
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Olivarez College Tagaytay — Reserve Facility</h1>
+</header>
+
+<div class="container">
+    <h2>Reserve Facility</h2>
+    <form id="reservationForm">
+        <label>Facility</label>
+        <input type="text" id="facility" readonly>
+
+        <label>Name</label>
+        <input type="text" id="name" readonly>
+
+        <label>Course & Section</label>
+        <input type="text" id="courseSection" placeholder="Enter your Course & Section" required>
+
+        <label>Student ID</label>
+        <input type="text" id="studentId" placeholder="Enter your Student ID" required>
+
+        <label>Date</label>
+        <input type="date" id="date" required>
+
+        <label>Start Time</label>
+        <input type="time" id="startTime" required>
+
+        <label>End Time</label>
+        <input type="time" id="endTime" required>
+
+        <label>Purpose</label>
+        <textarea id="purpose" rows="3" placeholder="Enter purpose" required></textarea>
+
+        <button type="submit">Submit Reservation</button>
+    </form>
+
+    <div id="postSubmit" style="display:none; text-align:center; margin-top:20px;">
+        <p>Reservation submitted successfully!</p>
+        <button id="goBackBtn" onclick="window.location.href='page1.html'">Go Back</button>
+        <button id="exitBtn" onclick="window.location.href='index.html'">Exit</button>
+    </div>
+</div>
+
+<script>
+// Load logged-in user
+const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+if(!loggedInUser || loggedInUser.role !== 'student'){
+    alert("Access denied. Redirecting to login.");
+    window.location.href = "index.html";
+}
+
+// Fill facility and name
+const urlParams = new URLSearchParams(window.location.search);
+const facilityName = urlParams.get('facility');
+document.getElementById('facility').value = facilityName;
+document.getElementById('name').value = loggedInUser.fullName;
+
+// Load reservations
+let reservations = JSON.parse(localStorage.getItem('reservations')) || [];
+
+const dateInput = document.getElementById('date');
+const startTimeInput = document.getElementById('startTime');
+const endTimeInput = document.getElementById('endTime');
+
+// Form submit
+document.getElementById('reservationForm').addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const courseSection = document.getElementById('courseSection').value;
+    const studentId = document.getElementById('studentId').value;
+    const date = dateInput.value;
+    const startTime = startTimeInput.value;
+    const endTime = endTimeInput.value;
+    const purpose = document.getElementById('purpose').value;
+
+    if(!date || !startTime || !endTime || !purpose || !courseSection || !studentId){
+        return alert("Please fill all fields.");
+    }
+
+    // Check overlapping reservations
+    const overlapping = reservations.some(r =>
+        r.facility === facilityName &&
+        r.date === date &&
+        !(endTime <= r.startTime || startTime >= r.endTime)
+    );
+    if(overlapping) return alert("This time slot is already reserved. Choose another.");
+
+    reservations.push({
+        name: loggedInUser.fullName,
+        facility: facilityName,
+        date: date,
+        startTime: startTime,
+        endTime: endTime,
+        courseSection: courseSection,
+        studentId: studentId,
+        purpose: purpose,
+        status: "Pending",
+        seen: false
+    });
+
+    localStorage.setItem('reservations', JSON.stringify(reservations));
+
+    // Show post-submit buttons
+    document.getElementById('reservationForm').style.display = 'none';
+    document.getElementById('postSubmit').style.display = 'block';
+});
+</script>
+
+</body>
+</html>

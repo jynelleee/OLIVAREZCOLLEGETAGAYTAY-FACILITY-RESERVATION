@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Olivarez College Tagaytay — Admin Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+body {
+    margin: 0;
+    font-family: "Century Gothic", sans-serif;
+    background: linear-gradient(to bottom right, #e8f5e9, #c8e6c9);
+}
+header h1 { font-size: 28px; margin: 0; }
+.logout-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px 15px;
+    background: #d32f2f;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: 0.3s;
+}
+.logout-btn:hover { background: #b71c1c; }
+
+.container {
+    max-width: 1200px;
+    margin: -60px auto 50px auto;
+    background: rgba(255,255,255,0.95);
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    padding: 40px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 30px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+th, td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+th { background: #2e7d32; color: white; }
+tr:hover { background: #f1f1f1; }
+
+button {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 8px;
+    background: #2e7d32;
+    color: white;
+    cursor: pointer;
+    margin: 2px;
+}
+button.accept { background: green; }
+button.reject { background: red; }
+button.archive { background: #1976d2; }
+button.viewHistory { background: #6a1b9a; }
+
+/* === Header Fixed === */
+header {
+    position: fixed; /* make it fixed */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    background-image: url('images/BACK.jpg');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-shadow: 1px 1px 6px rgba(0,0,0,0.7);
+    z-index: 10; /* make sure it's above other elements */
+}
+
+/* Push container below fixed header */
+.container {
+    max-width: 1200px;
+    margin: 160px auto 50px auto; /* top margin = header height + some spacing */
+    background: rgba(255,255,255,0.95);
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    padding: 40px;
+}
+
+/* Sticky table header */
+table thead th {
+    position: sticky;
+    top: 0;
+    background: #2e7d32; /* match header color */
+    color: white;
+    z-index: 2;
+}
+
+
+.status {
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 6px;
+    text-align: center;
+    color: white;
+}
+.pending { background: orange; }
+.accepted { background: green; }
+.rejected { background: red; }
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+.facility-card {
+    background: #e8f5e9;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    text-align: center;
+    padding: 15px;
+    transition: transform 0.3s, box-shadow 0.3s;
+    cursor: pointer;
+}
+.facility-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+}
+.facility-card img { width: 100%; border-radius: 12px 12px 0 0; }
+.facility-card p { margin: 10px 0 0 0; font-weight: 600; color: #2a802e; }
+
+.selected-facility {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 20px;
+    color: #2e7d32;
+    font-weight: 600;
+}
+
+h2{
+    color: #2e7d32;
+}
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Olivarez College Tagaytay — Admin Dashboard</h1>
+    <button class="logout-btn" onclick="logout()">Logout</button>
+</header>
+
+<div class="container">
+
+    <!-- Archive Buttons -->
+    <div style="margin-bottom:20px;">
+        <button class="archive" id="archiveDataBtn">Archive Completed Reservations</button>
+        <button class="viewHistory" id="viewHistoryBtn">View Reservation History</button>
+    </div>
+
+    <!-- Current Reservations -->
+    <h2>Student Reservations</h2>
+    <div class="selected-facility" id="selectedFacilityText">All Facilities</div>
+    <table id="reservationTable">
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Course & Section</th>
+                <th>Student ID</th>
+                <th>Facility</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Purpose</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <!-- Reservation History -->
+    <h2>Reservation History</h2>
+    <table id="historyTable">
+        <thead>
+            <tr>
+                <th>Student</th>
+                <th>Course & Section</th>
+                <th>Student ID</th>
+                <th>Facility</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Purpose</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <!-- Facilities -->
+    <h2>School Facilities</h2>
+    <div class="grid" id="facilitiesContainer"></div>
+</div>
+
+<script>
+// Load reservations and history
+let reservations = JSON.parse(localStorage.getItem('reservations')) || [];
+let reservationHistory = JSON.parse(localStorage.getItem('reservationHistory')) || [];
+
+// Facility data
+const facilities = [
+    {name:"Gym",img:"images/gym.jpg"},
+    {name:"Computer Laboratory",img:"images/computer-lab.png"},
+    {name:"Bar Laboratory",img:"images/bar.jpg"},
+    {name:"Education Laboratory",img:"images/educ-lab.png"},
+    {name:"Open Court",img:"images/opencourt.jpg"},
+    {name:"Library",img:"images/library.png"},
+    {name:"Amphitheater",img:"images/amphi.jpg"},
+    {name:"Convention Center",img:"images/covent.jpg"},
+    {name:"Criminology Laboratory",img:"images/crim-lab.png"}
+];
+
+let selectedFacility = null;
+
+// Render reservations table
+function renderReservations(){
+    const tbody = document.querySelector("#reservationTable tbody");
+    tbody.innerHTML = '';
+    let filtered = selectedFacility ? reservations.filter(r => r.facility === selectedFacility) : reservations;
+    filtered.forEach((res,index)=>{
+        let statusClass = '';
+        switch(res.status.toLowerCase()){
+            case 'pending': statusClass='pending'; break;
+            case 'accepted': statusClass='accepted'; break;
+            case 'rejected': statusClass='rejected'; break;
+        }
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${res.name}</td>
+            <td>${res.courseSection || ''}</td>
+            <td>${res.studentId || ''}</td>
+            <td>${res.facility}</td>
+            <td>${res.date}</td>
+            <td>${res.startTime || ''} - ${res.endTime || ''}</td>
+            <td>${res.purpose || ''}</td>
+            <td class="status ${statusClass}">${res.status}</td>
+            <td>
+                ${res.status==="Pending" ? `<button class="accept" onclick="updateStatus(${reservations.indexOf(res)},'Accepted')">Accept</button>
+                <button class="reject" onclick="updateStatus(${reservations.indexOf(res)},'Rejected')">Reject</button>` : ''}
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// Render history table
+function renderHistory(){
+    const tbody = document.querySelector("#historyTable tbody");
+    tbody.innerHTML = '';
+    reservationHistory.forEach(res=>{
+        let statusClass = '';
+        switch(res.status.toLowerCase()){
+            case 'accepted': statusClass='accepted'; break;
+            case 'rejected': statusClass='rejected'; break;
+        }
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${res.name}</td>
+            <td>${res.courseSection || ''}</td>
+            <td>${res.studentId || ''}</td>
+            <td>${res.facility}</td>
+            <td>${res.date}</td>
+            <td>${res.startTime || ''} - ${res.endTime || ''}</td>
+            <td>${res.purpose || ''}</td>
+            <td class="status ${statusClass}">${res.status}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// Update reservation status
+function updateStatus(index,status){
+    reservations[index].status = status;
+    localStorage.setItem('reservations', JSON.stringify(reservations));
+    renderReservations();
+}
+
+// Archive completed reservations
+document.getElementById('archiveDataBtn').addEventListener('click', ()=>{
+    const completed = reservations.filter(r=> r.status==='Accepted' || r.status==='Rejected');
+    if(completed.length === 0) { alert("No completed reservations to archive."); return; }
+    reservationHistory = reservationHistory.concat(completed);
+    localStorage.setItem('reservationHistory', JSON.stringify(reservationHistory));
+    reservations = reservations.filter(r=> r.status==='Pending');
+    localStorage.setItem('reservations', JSON.stringify(reservations));
+    renderReservations();
+    renderHistory();
+    alert("Completed reservations archived.");
+});
+
+// View history
+document.getElementById('viewHistoryBtn').addEventListener('click', ()=>{
+    renderHistory();
+});
+
+// Render facility cards
+const container = document.getElementById('facilitiesContainer');
+const selectedText = document.getElementById('selectedFacilityText');
+facilities.forEach(fac=>{
+    const card = document.createElement('div');
+    card.className = 'facility-card';
+    card.innerHTML = `<img src="${fac.img}" alt="${fac.name}"><p>${fac.name}</p>`;
+    card.addEventListener('click', ()=>{
+        selectedFacility = fac.name;
+        selectedText.textContent = `Showing reservations for: ${selectedFacility}`;
+        renderReservations();
+    });
+    container.appendChild(card);
+});
+
+// Reset filter on selected text click
+selectedText.addEventListener('click', ()=>{
+    selectedFacility = null;
+    selectedText.textContent = "All Facilities";
+    renderReservations();
+});
+
+// Logout function
+function logout(){
+    localStorage.removeItem('loggedInUser'); 
+    window.location.href = 'index.html';
+}
+
+// Initial render
+renderReservations();
+renderHistory();
+setInterval(renderReservations,3000);
+</script>
+
+</body>
+</html>

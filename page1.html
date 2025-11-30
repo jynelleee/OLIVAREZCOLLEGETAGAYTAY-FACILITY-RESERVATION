@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Dashboard - Olivarez College</title>
+<style>
+body {
+    font-family: "Century Gothic", sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to bottom right, #ffffff, #e8f5e9);
+}
+
+/* Header */
+header {
+    width: 100%;
+    height: 100px;
+    background-image: url('images/BACK.jpg');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.6);
+    position: relative;
+}
+header h1 { font-size: 24px; }
+button.menu-btn {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    background: red;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.menu-dropdown {
+    display: none;
+    position: absolute;
+    right: 20px;
+    top: 60px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.25);
+}
+.menu-dropdown button {
+    display: block;
+    width: 100%;
+    padding: 12px 20px;
+    border: none;
+    background: white;
+    text-align: left;
+    cursor: pointer;
+}
+.menu-dropdown button:hover { background: #e0f2f1; }
+
+/* Container */
+.container {
+    max-width: 1000px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+/* Facility Cards */
+#facilitiesContainer {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+.facility-card {
+    width: 200px;
+    background: #e8f5e9;
+    border-radius: 15px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    cursor: pointer;
+    text-align: center;
+    color: #1f761f;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.facility-card:hover { transform: scale(1.05); box-shadow: 0 8px 20px rgba(0,0,0,0.3); }
+.facility-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    border: #2e7d32;
+}
+
+/* Notification */
+#confirmNotification {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    text-align: center;
+    z-index: 2000;
+}
+#confirmNotification button {
+    margin: 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+}
+#confirmNotification button.reserve { background: #2e7d32; color:white; }
+#confirmNotification button.exit { background: #c62828; color:white; }
+
+/* Reservation Table */
+#reservationTable {
+    width: 100%;
+    margin-top: 40px;
+    border-collapse: collapse;
+}
+#reservationTable th, #reservationTable td {
+    border: 1px solid #ccc;
+    padding: 12px;
+    text-align: left;
+}
+.status {
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+.pending { background: orange; color: white; }
+.accepted { background: green; color: white; }
+.rejected { background: red; color: white; }
+
+h2{
+    font-family: "Century Gothic", sans-serif;
+    color:  rgb(3, 86, 3);
+}
+
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Olivarez College Tagaytay - Student Dashboard</h1>
+    <button class="menu-btn" onclick="toggleMenu()">Menu &#9662;</button>
+    <div class="menu-dropdown" id="menuDropdown">
+        <button onclick="logout()">Logout</button>
+    </div>
+</header>
+
+<div class="container">
+    <h2>Available Facilities</h2>
+    <div id="facilitiesContainer"></div>
+
+    <h2>Your Reservations</h2>
+    <table id="reservationTable">
+        <thead>
+            <tr>
+                <th>Facility</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</div>
+
+<div id="confirmNotification">
+    <p>Do you want to reserve this facility?</p>
+    <button class="reserve">Reserve</button>
+    <button class="exit">Exit</button>
+</div>
+
+<script>
+// --- FIXED: ensure loggedInUser exists in localStorage ---
+let loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+if(!loggedInUser){
+    loggedInUser = {fullName:"Juan Dela Cruz", role:"student"};
+    localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+}
+
+// Facilities array
+const facilities = [
+    {name:"Gym",img:"images/gym.jpg"},
+    {name:"Computer Laboratory",img:"images/computer-lab.png"},
+    {name:"Bar Laboratory",img:"images/bar.jpg"},
+    {name:"Education Laboratory",img:"images/educ-lab.png"},
+    {name:"Open Court",img:"images/opencourt.jpg"},
+    {name:"Library",img:"images/library.png"},
+    {name:"Amphitheater",img:"images/amphi.jpg"},
+    {name:"Convention Center",img:"images/convent.jpg"},
+    {name:"Criminology Laboratory",img:"images/crim-lab.png"}
+];
+
+const facilitiesContainer = document.getElementById('facilitiesContainer');
+const notification = document.getElementById('confirmNotification');
+let selectedFacility = null;
+
+// Render facilities
+facilities.forEach(fac => {
+    const card = document.createElement('div');
+    card.className = 'facility-card';
+    card.innerHTML = `<img src="${fac.img}" alt="${fac.name}"><p>${fac.name}</p>`;
+    card.addEventListener('click', () => {
+        selectedFacility = fac.name;
+        notification.style.display = 'block';
+    });
+    facilitiesContainer.appendChild(card);
+});
+
+// Menu toggle
+function toggleMenu(){
+    const menu = document.getElementById('menuDropdown');
+    menu.style.display = menu.style.display==='block'?'none':'block';
+}
+
+// Logout
+function logout(){
+    localStorage.removeItem('loggedInUser');
+    window.location.href = "index.html";
+}
+
+// Notification buttons
+document.querySelector('#confirmNotification .reserve').addEventListener('click',()=>{
+    notification.style.display='none';
+    window.location.href = `page3.html?facility=${encodeURIComponent(selectedFacility)}`;
+});
+document.querySelector('#confirmNotification .exit').addEventListener('click',()=>{
+    notification.style.display='none';
+});
+
+// Render student reservations
+function renderReservations(){
+    const reservations = JSON.parse(localStorage.getItem('reservations')) || [];
+    const studentReservations = reservations.filter(r=>r.name===loggedInUser.fullName);
+    const tbody = document.querySelector('#reservationTable tbody');
+    tbody.innerHTML = '';
+    studentReservations.forEach(r=>{
+        const tr = document.createElement('tr');
+        const time = r.startTime && r.endTime ? r.startTime+" - "+r.endTime : r.time || '';
+        const statusClass = r.status.toLowerCase();
+        tr.innerHTML = `<td>${r.facility}</td><td>${r.date}</td><td>${time}</td><td class="status ${statusClass}">${r.status}</td>`;
+        tbody.appendChild(tr);
+    });
+}
+
+// Initial render
+renderReservations();
+setInterval(renderReservations, 3000);
+</script>
+
+</body>
+</html>
