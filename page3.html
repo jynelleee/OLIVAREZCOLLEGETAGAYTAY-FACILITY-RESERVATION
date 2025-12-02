@@ -4,16 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Olivarez College Tagaytay — Reserve Facility</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
 <style>
 body {
     font-family: "Century Gothic", sans-serif;
-    background: linear-gradient(to bottom, #e8f5e9);
+    background: linear-gradient(to bottom left, #b7e7b1, white);
     margin: 0;
     min-height: 100vh;
 }
 
-/* === Header === */
 header {
     width: 100%;
     height: 150px;
@@ -32,9 +31,8 @@ header h1 {
     margin: 0;
 }
 
-/* === Container === */
 .container {
-    background: white;
+
     padding: 40px 30px;
     border-radius: 15px;
     box-shadow: 0 8px 25px rgba(0,0,0,0.2);
@@ -42,8 +40,14 @@ header h1 {
     max-width: 500px;
     margin: 20px auto;
     opacity: 0;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(12px);
     animation: fadeIn 1s forwards;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    border-radius: 20px;
+    
 }
+
 
 @keyframes fadeIn { to { opacity: 1; } }
 
@@ -93,7 +97,6 @@ button {
 }
 button:hover { background: #1b5e20; transform: scale(1.03); }
 
-/* === Post-submit buttons === */
 #postSubmit button {
     width: 120px;
     margin: 10px;
@@ -121,32 +124,37 @@ button:hover { background: #1b5e20; transform: scale(1.03); }
 <div class="container">
     <h2>Reserve Facility</h2>
     <form id="reservationForm">
-        <label>Facility</label>
-        <input type="text" id="facility" readonly>
+    <label>Facility</label>
+    <input type="text" id="facility" readonly>
 
-        <label>Name</label>
-        <input type="text" id="name" readonly>
+    <label>Name</label>
+    <input type="text" id="name" readonly>
 
-        <label>Course & Section</label>
-        <input type="text" id="courseSection" placeholder="Enter your Course & Section" required>
+    <label>Course & Section</label>
+    <input type="text" id="courseSection" placeholder="Enter your Course & Section" required>
 
-        <label>Student ID</label>
-        <input type="text" id="studentId" placeholder="Enter your Student ID" required>
+    <label>Student ID</label>
+    <input type="text" id="studentId" placeholder="Enter your Student ID" required>
 
-        <label>Date</label>
-        <input type="date" id="date" required>
+    <label>Date</label>
+    <input type="date" id="date" required>
 
-        <label>Start Time</label>
-        <input type="time" id="startTime" required>
+    <label>Start Time</label>
+    <input type="time" id="startTime" required>
 
-        <label>End Time</label>
-        <input type="time" id="endTime" required>
+    <label>End Time</label>
+    <input type="time" id="endTime" required>
 
-        <label>Purpose</label>
-        <textarea id="purpose" rows="3" placeholder="Enter purpose" required></textarea>
+    <label>Purpose</label>
+    <textarea id="purpose" rows="3" placeholder="Enter purpose" required></textarea>
 
-        <button type="submit">Submit Reservation</button>
-    </form>
+    <div style="display:flex; gap:10px; margin-top:20px;">
+        
+        <button type="button" style="flex:1; background:#2e7d32; color:white; font-weight:700;" onclick="window.location.href='page1.html'">Back</button>
+        <button type="submit" style="flex:1;">Submit Reservation</button>
+    </div>
+</form>
+
 
     <div id="postSubmit" style="display:none; text-align:center; margin-top:20px;">
         <p>Reservation submitted successfully!</p>
@@ -156,68 +164,38 @@ button:hover { background: #1b5e20; transform: scale(1.03); }
 </div>
 
 <script>
-// Load logged-in user
 const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-if(!loggedInUser || loggedInUser.role !== 'student'){
-    alert("Access denied. Redirecting to login.");
-    window.location.href = "index.html";
-}
+if(!loggedInUser) window.location.href = "index.html";
 
-// Fill facility and name
+
 const urlParams = new URLSearchParams(window.location.search);
-const facilityName = urlParams.get('facility');
+const facilityName = urlParams.get('facility') || '';
+
+
 document.getElementById('facility').value = facilityName;
 document.getElementById('name').value = loggedInUser.fullName;
 
-// Load reservations
+
 let reservations = JSON.parse(localStorage.getItem('reservations')) || [];
 
-const dateInput = document.getElementById('date');
-const startTimeInput = document.getElementById('startTime');
-const endTimeInput = document.getElementById('endTime');
-
-// Form submit
-document.getElementById('reservationForm').addEventListener('submit', (e)=>{
+document.getElementById('reservationForm').addEventListener('submit', e=>{
     e.preventDefault();
     const courseSection = document.getElementById('courseSection').value;
     const studentId = document.getElementById('studentId').value;
-    const date = dateInput.value;
-    const startTime = startTimeInput.value;
-    const endTime = endTimeInput.value;
+    const date = document.getElementById('date').value;
+    const startTime = document.getElementById('startTime').value;
+    const endTime = document.getElementById('endTime').value;
     const purpose = document.getElementById('purpose').value;
 
-    if(!date || !startTime || !endTime || !purpose || !courseSection || !studentId){
-        return alert("Please fill all fields.");
-    }
+    if(!courseSection||!studentId||!date||!startTime||!endTime||!purpose) return alert("Fill all fields");
 
-    // Check overlapping reservations
-    const overlapping = reservations.some(r =>
-        r.facility === facilityName &&
-        r.date === date &&
-        !(endTime <= r.startTime || startTime >= r.endTime)
-    );
-    if(overlapping) return alert("This time slot is already reserved. Choose another.");
+    const overlapping = reservations.some(r=>r.facility===facilityName && r.date===date && !(endTime<=r.startTime||startTime>=r.endTime));
+    if(overlapping) return alert("Time slot taken");
 
-    reservations.push({
-        name: loggedInUser.fullName,
-        facility: facilityName,
-        date: date,
-        startTime: startTime,
-        endTime: endTime,
-        courseSection: courseSection,
-        studentId: studentId,
-        purpose: purpose,
-        status: "Pending",
-        seen: false
-    });
-
+    reservations.push({name:loggedInUser.fullName, facility:facilityName, courseSection, studentId, date, startTime, endTime, purpose, status:"Pending"});
     localStorage.setItem('reservations', JSON.stringify(reservations));
 
-    // Show post-submit buttons
-    document.getElementById('reservationForm').style.display = 'none';
-    document.getElementById('postSubmit').style.display = 'block';
+    document.getElementById('reservationForm').style.display='none';
+    document.getElementById('postSubmit').style.display='block';
 });
 </script>
-
-</body>
-</html>

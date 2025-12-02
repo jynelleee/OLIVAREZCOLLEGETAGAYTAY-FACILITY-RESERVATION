@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Olivarez College Tagaytay — Forgot Password</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
 <style>
-/* === Global Styles === */
+
 body {
     font-family: "Century Gothic", sans-serif;
     margin: 0;
@@ -21,7 +21,6 @@ body {
     background-attachment: fixed;
 }
 
-/* === Blur Effect for Background === */
 body::before {
     content: "";
     position: fixed;
@@ -32,20 +31,24 @@ body::before {
     z-index: -1;
 }
 
-/* === Container === */
 .container {
-    background: rgba(255, 255, 255, 0.95);
-    padding: 40px 30px;
-    border-radius: 15px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    width: 400px;
+    max-width: 90%;
+    background: rgba(255, 255, 255, 0.25); 
+    padding: 45px 35px;
+    border-radius: 25px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);             
+    -webkit-backdrop-filter: blur(10px);    
     text-align: center;
-    width: 90%;
-    max-width: 400px;
     opacity: 0;
-    animation: fadeIn 1s forwards;
+    transform: translateY(20px);
+    animation: fadeIn 1s forwards ease-out;
 }
 
-/* === Titles === */
+
+
 h1 {
     color: #2e7d32;
     font-size: 28px;
@@ -53,7 +56,6 @@ h1 {
     font-weight: 700;
 }
 
-/* === Input Fields === */
 input[type="email"] {
     width:90%;
     padding: 14px;
@@ -68,7 +70,7 @@ input[type="email"]:focus {
     box-shadow: 0 0 8px rgba(46,125,50,0.3); 
 }
 
-/* === Buttons === */
+
 button.submit-btn, .back-btn {
     width: 100%;
     padding: 14px;
@@ -85,7 +87,7 @@ button.submit-btn:hover { background: #1b5e20; transform: scale(1.03); }
 button.back-btn { background: #ccc; color: #2e7d32; }
 button.back-btn:hover { background: #aaa; transform: scale(1.03); }
 
-/* === Message & Toast === */
+
 .message {
     color: red;
     font-weight: 600;
@@ -113,7 +115,7 @@ button.back-btn:hover { background: #aaa; transform: scale(1.03); }
     transform: translateX(-50%) translateY(-10px);
 }
 
-/* === Animations === */
+
 @keyframes fadeIn { to { opacity: 1; } }
 
 </style>
@@ -130,7 +132,7 @@ button.back-btn:hover { background: #aaa; transform: scale(1.03); }
     <button onclick="window.location.href='index.html'" class="back-btn">Back to Login</button>
 </div>
 
-<!-- Toast Notification -->
+
 <div id="toast" class="toast"></div>
 
 <script>
@@ -151,7 +153,6 @@ form.addEventListener('submit', function(e){
     showToast(`Your password is: ${user.password}`);
 });
 
-// Show toast function
 function showToast(message){
     toast.textContent = message;
     toast.classList.add('show');

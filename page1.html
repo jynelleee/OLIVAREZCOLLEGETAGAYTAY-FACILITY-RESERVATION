@@ -4,18 +4,19 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Student Dashboard - Olivarez College</title>
+
 <style>
 body {
     font-family: "Century Gothic", sans-serif;
     margin: 0;
     padding: 0;
-    background: linear-gradient(to bottom right, #ffffff, #e8f5e9);
+    background: linear-gradient(to bottom right, #b7e7b1, #e8f5e9);
 }
 
-/* Header */
 header {
+    position: fixed;
     width: 100%;
-    height: 100px;
+    height: 150px;
     background-image: url('images/BACK.jpg');
     background-size: cover;
     background-position: center;
@@ -59,14 +60,31 @@ button.menu-btn {
 }
 .menu-dropdown button:hover { background: #e0f2f1; }
 
-/* Container */
+.profile-container {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    background: rgba(255, 255, 255, 0.3);
+    color: rgb(255, 255, 255);
+    font-weight: bold;
+    padding: 8px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    user-select: none;
+}
+
+
 .container {
     max-width: 1000px;
     margin: 30px auto;
     padding: 0 20px;
+    background: rgba(255,255,255,0.15);
+    backdrop-filter: blur(12px);
+    animation: fadeIn 1s forwards;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
 }
 
-/* Facility Cards */
+
 #facilitiesContainer {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -92,7 +110,7 @@ button.menu-btn {
     border: #2e7d32;
 }
 
-/* Notification */
+
 #confirmNotification {
     display: none;
     position: fixed;
@@ -117,7 +135,7 @@ button.menu-btn {
 #confirmNotification button.reserve { background: #2e7d32; color:white; }
 #confirmNotification button.exit { background: #c62828; color:white; }
 
-/* Reservation Table */
+
 #reservationTable {
     width: 100%;
     margin-top: 40px;
@@ -140,6 +158,7 @@ button.menu-btn {
 h2{
     font-family: "Century Gothic", sans-serif;
     color:  rgb(3, 86, 3);
+
 }
 
 </style>
@@ -148,11 +167,14 @@ h2{
 
 <header>
     <h1>Olivarez College Tagaytay - Student Dashboard</h1>
+    
+
     <button class="menu-btn" onclick="toggleMenu()">Menu &#9662;</button>
     <div class="menu-dropdown" id="menuDropdown">
         <button onclick="logout()">Logout</button>
     </div>
 </header>
+
 
 <div class="container">
     <h2>Available Facilities</h2>
@@ -172,89 +194,63 @@ h2{
     </table>
 </div>
 
-<div id="confirmNotification">
-    <p>Do you want to reserve this facility?</p>
-    <button class="reserve">Reserve</button>
-    <button class="exit">Exit</button>
-</div>
-
 <script>
-// --- FIXED: ensure loggedInUser exists in localStorage ---
 let loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-if(!loggedInUser){
-    loggedInUser = {fullName:"Juan Dela Cruz", role:"student"};
-    localStorage.setItem('loggedInUser', JSON.stringify(loggedInUser));
+if(!loggedInUser){ 
+    window.location.href = "index.html";
 }
 
-// Facilities array
 const facilities = [
     {name:"Gym",img:"images/gym.jpg"},
-    {name:"Computer Laboratory",img:"images/computer-lab.png"},
+    {name:"Computer Laboratory",img:"images/comlab.jpg"},
     {name:"Bar Laboratory",img:"images/bar.jpg"},
-    {name:"Education Laboratory",img:"images/educ-lab.png"},
+    {name:"Education Laboratory",img:"images/beedlab.jpg"},
     {name:"Open Court",img:"images/opencourt.jpg"},
-    {name:"Library",img:"images/library.png"},
+    {name:"Library",img:"images/lib.jpg"},
     {name:"Amphitheater",img:"images/amphi.jpg"},
-    {name:"Convention Center",img:"images/convent.jpg"},
-    {name:"Criminology Laboratory",img:"images/crim-lab.png"}
+    {name:"Convention Center",img:"images/covent.jpg"},
+    {name:"Criminology Laboratory",img:"images/crimlab.jpg"}
 ];
 
 const facilitiesContainer = document.getElementById('facilitiesContainer');
-const notification = document.getElementById('confirmNotification');
-let selectedFacility = null;
 
-// Render facilities
 facilities.forEach(fac => {
     const card = document.createElement('div');
     card.className = 'facility-card';
     card.innerHTML = `<img src="${fac.img}" alt="${fac.name}"><p>${fac.name}</p>`;
     card.addEventListener('click', () => {
-        selectedFacility = fac.name;
-        notification.style.display = 'block';
+        window.location.href = `page3.html?facility=${encodeURIComponent(fac.name)}`;
     });
     facilitiesContainer.appendChild(card);
 });
 
-// Menu toggle
-function toggleMenu(){
-    const menu = document.getElementById('menuDropdown');
-    menu.style.display = menu.style.display==='block'?'none':'block';
-}
-
-// Logout
-function logout(){
-    localStorage.removeItem('loggedInUser');
-    window.location.href = "index.html";
-}
-
-// Notification buttons
-document.querySelector('#confirmNotification .reserve').addEventListener('click',()=>{
-    notification.style.display='none';
-    window.location.href = `page3.html?facility=${encodeURIComponent(selectedFacility)}`;
-});
-document.querySelector('#confirmNotification .exit').addEventListener('click',()=>{
-    notification.style.display='none';
-});
-
-// Render student reservations
 function renderReservations(){
     const reservations = JSON.parse(localStorage.getItem('reservations')) || [];
-    const studentReservations = reservations.filter(r=>r.name===loggedInUser.fullName);
+    const studentReservations = reservations.filter(r => r.name === loggedInUser.fullName);
     const tbody = document.querySelector('#reservationTable tbody');
     tbody.innerHTML = '';
-    studentReservations.forEach(r=>{
+    studentReservations.forEach(r => {
         const tr = document.createElement('tr');
-        const time = r.startTime && r.endTime ? r.startTime+" - "+r.endTime : r.time || '';
+        const time = r.startTime && r.endTime ? r.startTime + " - " + r.endTime : r.time || '';
         const statusClass = r.status.toLowerCase();
         tr.innerHTML = `<td>${r.facility}</td><td>${r.date}</td><td>${time}</td><td class="status ${statusClass}">${r.status}</td>`;
         tbody.appendChild(tr);
     });
 }
 
-// Initial render
 renderReservations();
 setInterval(renderReservations, 3000);
-</script>
 
-</body>
-</html>
+function toggleMenu(){
+    const menu = document.getElementById('menuDropdown');
+    menu.style.display = menu.style.display==='block'?'none':'block';
+}
+
+const studentName = document.getElementById('studentName');
+studentName.textContent = loggedInUser.fullName;
+
+function logout(){
+    localStorage.removeItem('loggedInUser');
+    window.location.href = "index.html";
+}
+</script>

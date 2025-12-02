@@ -4,10 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Olivarez College Tagaytay — Admin Dashboard Login</title>
-<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
 <style>
-/* === Global Styles === */
+
 body {
     font-family: "Century Gothic", sans-serif;
     margin: 0;
@@ -47,23 +46,24 @@ h1 {
     text-shadow: 0 2px 3px rgba(0,0,0,0.15);
 }
 
-/* === Glassmorphic Login Card === */
 .container {
     width: 400px;
     max-width: 90%;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.25);  
     padding: 45px 35px;
     border-radius: 25px;
     box-shadow: 0 8px 32px rgba(0,0,0,0.25);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255,255,255,0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);             
+    -webkit-backdrop-filter: blur(10px);  
     text-align: center;
     opacity: 0;
     transform: translateY(20px);
     animation: fadeIn 1s forwards ease-out;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
+
+
 .container:hover {
     transform: translateY(0);
     box-shadow: 0 15px 40px rgba(0,0,0,0.3);
@@ -80,7 +80,6 @@ h2 {
     font-weight: 300;
 }
 
-/* === Form Labels & Inputs === */
 label {
     display: block;
     text-align: left;
@@ -88,7 +87,7 @@ label {
     margin-top: 12px;
     margin-bottom: 5px;
     font-weight: 300;
-    color: #ffffff;
+    color: #000000;
 }
 
 input[type="text"],
@@ -110,7 +109,7 @@ input:focus {
     outline: none;
 }
 
-/* === Buttons === */
+
 button {
     width: 100%;
     padding: 14px;
@@ -144,7 +143,7 @@ button {
     transform: translateY(-2px) scale(1.05);
 }
 
-/* === Links === */
+
 a {
     display: block;
     font-size: 13px;
@@ -161,7 +160,7 @@ a:hover {
     text-decoration: underline;
 }
 
-/* === Error Message === */
+
 .message {
     color: #c62828;
     font-weight: 700;
@@ -243,12 +242,6 @@ if(!users.some(u => u.role === "admin")){
     localStorage.setItem('users', JSON.stringify(users));
 }
 
-// Optional: Dark mode toggle
-let darkMode = false;
-setInterval(() => {
-    darkMode = !darkMode;
-    document.body.classList.toggle('dark-mode', darkMode);
-}, 12000);
 </script>
 </body>
 </html>
